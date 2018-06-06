@@ -1,0 +1,70 @@
+<application>
+  <component name="ProjectJdkTable">
+    <jdk version="2">
+      <name value="Python 3.6 (MNIST_TUT)" />
+      <type value="Python SDK" />
+      <version value="Python 3.6.5" />
+      <homePath value="C:\Users\Hermann\PycharmProjects\MNIST_TUT\venv\Scripts\python.exe" />
+      <roots>
+        <classPath>
+          <root type="composite">
+            <root url="file://$USER_HOME$/AppData/Local/Programs/Python/Python36/DLLs" type="simple" />
+            <root url="file://$USER_HOME$/AppData/Local/Programs/Python/Python36/Lib" type="simple" />
+            <root url="file://$USER_HOME$/AppData/Local/Programs/Python/Python36" type="simple" />
+            <root url="file://$USER_HOME$/PycharmProjects/MNIST_TUT/venv" type="simple" />
+            <root url="file://$USER_HOME$/PycharmProjects/MNIST_TUT/venv/Lib/site-packages" type="simple" />
+            <root url="jar://$USER_HOME$/PycharmProjects/MNIST_TUT/venv/Lib/site-packages/setuptools-28.8.0-py3.6.egg!/" type="simple" />
+            <root url="file://$USER_HOME$/PycharmProjects/MNIST_TUT/venv/Lib/site-packages/pip-9.0.1-py3.6.egg" type="simple" />
+            <root url="file://$USER_HOME$/.PyCharm2018.1/system/python_stubs/-1022133663" type="simple" />
+            <root url="file://$APPLICATION_HOME_DIR$/helpers/python-skeletons" type="simple" />
+            <root url="file://$APPLICATION_HOME_DIR$/helpers/typeshed/stdlib/3.6" type="simple" />
+            <root url="file://$APPLICATION_HOME_DIR$/helpers/typeshed/stdlib/3.5" type="simple" />
+            <root url="file://$APPLICATION_HOME_DIR$/helpers/typeshed/stdlib/3.4" type="simple" />
+            <root url="file://$APPLICATION_HOME_DIR$/helpers/typeshed/stdlib/3.3" type="simple" />
+            <root url="file://$APPLICATION_HOME_DIR$/helpers/typeshed/stdlib/3" type="simple" />
+            <root url="file://$APPLICATION_HOME_DIR$/helpers/typeshed/stdlib/2and3" type="simple" />
+            <root url="file://$APPLICATION_HOME_DIR$/helpers/typeshed/third_party/3" type="simple" />
+            <root url="file://$APPLICATION_HOME_DIR$/helpers/typeshed/third_party/2and3" type="simple" />
+          </root>
+        </classPath>
+        <sourcePath>
+          <root type="composite" />
+        </sourcePath>
+      </roots>
+      <additional ASSOCIATED_PROJECT_PATH="$USER_HOME$/PycharmProjects/MNIST_TUT" />
+    </jdk>
+    <jdk version="2">
+      <name value="Python 3.6 (BachelorArbeit_Headpose Estimation)" />
+      <type value="Python SDK" />
+      <version value="Python 3.6.5" />
+      <homePath value="C:\Users\Hermann\PycharmProjects\BachelorArbeit_Headpose Estimation\venv\Scripts\python.exe" />
+      <roots>
+        <classPath>
+          <root type="composite">
+            <root url="file://$USER_HOME$/AppData/Local/Programs/Python/Python36/DLLs" type="simple" />
+            <root url="file://$USER_HOME$/AppData/Local/Programs/Python/Python36/Lib" type="simple" />
+            <root url="file://$USER_HOME$/AppData/Local/Programs/Python/Python36" type="simple" />
+            <root url="file://$USER_HOME$/PycharmProjects/BachelorArbeit_Headpose Estimation/venv" type="simple" />
+            <root url="file://$USER_HOME$/PycharmProjects/BachelorArbeit_Headpose Estimation/venv/Lib/site-packages" type="simple" />
+            <root url="jar://$USER_HOME$/PycharmProjects/BachelorArbeit_Headpose Estimation/venv/Lib/site-packages/setuptools-39.1.0-py3.6.egg!/" type="simple" />
+            <root url="file://$USER_HOME$/PycharmProjects/BachelorArbeit_Headpose Estimation/venv/Lib/site-packages/pip-10.0.1-py3.6.egg" type="simple" />
+            <root url="file://$USER_HOME$/.PyCharm2018.1/system/python_stubs/-21627324" type="simple" />
+            <root url="file://$APPLICATION_HOME_DIR$/helpers/python-skeletons" type="simple" />
+            <root url="file://$APPLICATION_HOME_DIR$/helpers/typeshed/stdlib/3.6" type="simple" />
+            <root url="file://$APPLICATION_HOME_DIR$/helpers/typeshed/stdlib/3.5" type="simple" />
+            <root url="file://$APPLICATION_HOME_DIR$/helpers/typeshed/stdlib/3.4" type="simple" />
+            <root url="file://$APPLICATION_HOME_DIR$/helpers/typeshed/stdlib/3.3" type="simple" />
+            <root url="file://$APPLICATION_HOME_DIR$/helpers/typeshed/stdlib/3" type="simple" />
+            <root url="file://$APPLICATION_HOME_DIR$/helpers/typeshed/stdlib/2and3" type="simple" />
+            <root url="file://$APPLICATION_HOME_DIR$/helpers/typeshed/third_party/3" type="simple" />
+            <root url="file://$APPLICATION_HOME_DIR$/helpers/typeshed/third_party/2and3" type="simple" />
+          </root>
+        </classPath>
+        <sourcePath>
+          <root type="composite" />
+        </sourcePath>
+      </roots>
+      <additional ASSOCIATED_PROJECT_PATH="$USER_HOME$/PycharmProjects/BachelorArbeit_Headpose Estimation" />
+    </jdk>
+  </component>
+</application>
