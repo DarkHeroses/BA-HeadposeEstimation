@@ -1,86 +1,59 @@
+from pprint import pprint
+
 import numpy as np
 import tensorflow as tf
 import os
 import pandas as pd
-import sys
 
 tf.logging.set_verbosity(tf.logging.INFO)
 directory = 'C:\\Users\\Hermann\\Documents\\6. Semester - Bachelorarbeit\\Data_Sets\\Biwi\\kinect_head_pose_db\\hpdb\\'
 
 
-def read_label_file(temp_dir):
-    # print(temp_dir)
-    file = open(temp_dir, "r")
-    mat = np.zeros([4, 3], dtype=float)
-    # print(mat)
-    i = 0
-    j = 0
-    for line in file:
-        # print("i: " + str(i))
-        if line == "\n":
-            continue
-        array_ofstring = line.split()
-        for el in array_ofstring:
-            # print("j: " + str(j))
-            mat[i][j] = float(el)
-            j += 1
-        i += 1
-        j = 0
-    # print(mat)
-
-    file.close()
-
-    return mat
+def _parse_function(filename, label):
+    image_string = tf.read_file(filename)
+    image_decoded = tf.image.decode_png(image_string)
+    image_resized = tf.image.resize_images(image_decoded, [640, 480])
+    return image_resized, label
 
 
-def get_datesets():
-    counter = 0
-    images = []
+def get_datasets():
+    # train_data, train_labels, test_data, test_labels, eval_data, eval_label = tf.data.Dataset()
+    filenames = []
     labels = []
-    depth_images = []
     folder_counter = sum([len(d) for r, d, folder in os.walk(directory)])
-    datasets = {"rgb": None, "label": None, "depth": None}
-    for i in range(folder_counter):
-        subdirect = directory + '{:02}'.format(i + 1) + "\\"
-        # print("Subdirectory Var created:" + subdirect)
+    for i in range(1, 2):  # folder_counter+1):
+        print("i" + str(i))
+        subdirect = directory + '{:02}'.format(i) + "\\"
         try:
             for filename in os.listdir(subdirect):
                 if filename.endswith("_pose.txt"):
-                    labels.append(tf.reshape(read_label_file(os.path.join(subdirect, filename)), [-1]))
+                    labels.append(
+                        pd.read_csv(os.path.join(subdirect, filename), delimiter=" ", header=None).dropna(
+                            axis=1).values)
+                    continue
                 if filename.endswith(".png"):
-                    # print("looking for files")
-                    # #print(os.path.join(directory, filename))
-                    images.append(tf.image.decode_png(tf.read_file(os.path.join(subdirect, filename)), channels=1))
-                    counter += 1
-                    # Dateipfad + '{:02}'.format(i) + "\\frame_" + '{:05}'.format(j) + "_rgb.png"
-
-                    # print("added to dataset")
+                    filenames.append(os.path.join(subdirect, filename))
+                    continue
                 if filename.endswith("_depth.bin"):
-                    # print("looking for files")
-                    # #print(os.path.join(directory, filename))
-                    depth_images.append(
-                        tf.image.decode_png(tf.read_file(os.path.join(subdirect, filename)), channels=1))
-                    # Dateipfad + '{:02}'.format(i) + "\\frame_" + '{:05}'.format(j) + "_rgb.png"
-                    # print("added to dataset")
+                    pass
                 else:
                     # print("Lets Continue")
                     continue
         except Exception:
-            # print("Folder not found")
+            print("Folder not found")
             continue
-    # print("Folder_count:" + str(folder_counter))
-    # print("Files added:" + str(counter))
-    print("RGB")
-    datasets["rgb"] = tf.data.Dataset.from_tensors(images)
-    print("label")
-    datasets["label"] = tf.data.Dataset.from_tensor_slices(labels)
-    print("depth")
-    datasets["depth"] = tf.data.Dataset.from_tensor_slices(depth_images)
-    return datasets
+
+    filename_tensor = tf.constant(filenames)
+    labels_tensor = tf.constant(np.array(labels))
+
+    dataset = tf.data.Dataset.from_tensor_slices((filename_tensor, labels_tensor))
+
+    return dataset
 
 
 def cnn_model_fn(features, labels, mode):
-    input_layer = features["x"]  # tf.reshape(features["x"], [-1, 640, 480, 3])
+    pprint(features)
+    input_layer = tf.reshape(features, [-1, 640, 480, 3])
 
     conv1 = tf.layers.conv2d(
         inputs=input_layer,
@@ -158,7 +131,8 @@ def cnn_model_fn(features, labels, mode):
 
 def main(unused):
     # sess = tf.InteractiveSession()
-    biwi = get_datesets()
+    dataset = get_datasets()
+    # train_data, train_labels, test_data, test_labels = get_datasets()
     print('Create the Estimator')
     head_pose_classifier = tf.estimator.Estimator(
         model_fn=cnn_model_fn,
@@ -170,30 +144,13 @@ def main(unused):
     logging_hook = tf.train.LoggingTensorHook(tensors=tensors_to_log, every_n_iter=50)
 
     print('Train the model')
-    train_input_fn = tf.estimator.inputs.numpy_input_fn(
-        x={"x": biwi["rgb"]},
-        y=biwi["label"],
-        batch_size=100,
-        num_epochs=None,
-        shuffle=True)
-    print("head_pose_classifier.train")
     head_pose_classifier.train(
-        input_fn=train_input_fn,
+        input_fn=get_datasets,
         steps=20000,
         hooks=[logging_hook])
 
-    print('Evaluate the model and print results')
-    eval_input_fn = tf.estimator.inputs.numpy_input_fn(
-        x={"x": biwi["rgb"][0]},
-        y=biwi["label"],
-        num_epochs=1,
-        shuffle=False)
-
-    eval_results = head_pose_classifier.evaluate(input_fn=eval_input_fn)
-    file = open("eval_results.log", "w")
+    eval_results = head_pose_classifier.evaluate(input_fn=dataset)
     print(eval_results)
-    file.write(eval_results)
-    file.close()
 
 
 if __name__ == "__main__":
