@@ -1,9 +1,9 @@
+import os
 from pprint import pprint
 
 import numpy as np
-import tensorflow as tf
-import os
 import pandas as pd
+import tensorflow as tf
 
 tf.logging.set_verbosity(tf.logging.INFO)
 directory = 'C:\\Users\\Hermann\\Documents\\6. Semester - Bachelorarbeit\\Data_Sets\\Biwi\\kinect_head_pose_db\\hpdb\\'
@@ -12,7 +12,7 @@ directory = 'C:\\Users\\Hermann\\Documents\\6. Semester - Bachelorarbeit\\Data_S
 def _parse_function(filename, label):
     image_string = tf.read_file(filename)
     image_decoded = tf.image.decode_png(image_string)
-    image_resized = tf.image.resize_images(image_decoded, [640, 480])
+    image_resized = tf.image.resize_images(image_decoded, [64, 64])
     return image_resized, label
 
 
@@ -27,9 +27,9 @@ def get_datasets():
         try:
             for filename in os.listdir(subdirect):
                 if filename.endswith("_pose.txt"):
-                    labels.append(
-                        pd.read_csv(os.path.join(subdirect, filename), delimiter=" ", header=None).dropna(
-                            axis=1).values)
+                    labels.append(np.reshape(
+                        pd.read_csv(os.path.join(subdirect, filename), delimiter=" ", header=None, nrows=3).dropna(
+                            axis=1).values, [-1]))
                     continue
                 if filename.endswith(".png"):
                     filenames.append(os.path.join(subdirect, filename))
@@ -42,18 +42,20 @@ def get_datasets():
         except Exception:
             print("Folder not found")
             continue
-
+    batch_size = 100
     filename_tensor = tf.constant(filenames)
     labels_tensor = tf.constant(np.array(labels))
 
     dataset = tf.data.Dataset.from_tensor_slices((filename_tensor, labels_tensor))
-
+    dataset = dataset.map(_parse_function)
+    dataset = dataset.apply(tf.contrib.data.batch_and_drop_remainder(batch_size)
+                            )
     return dataset
 
 
 def cnn_model_fn(features, labels, mode):
     pprint(features)
-    input_layer = tf.reshape(features, [-1, 640, 480, 3])
+    input_layer = tf.reshape(features, [-1, 64, 64, 4])
 
     conv1 = tf.layers.conv2d(
         inputs=input_layer,
@@ -97,23 +99,22 @@ def cnn_model_fn(features, labels, mode):
         padding="same",
         activation=tf.nn.relu
     )
-    dense = tf.layers.dense(inputs=conv5, units=120, activation=tf.nn.relu)
+    unit_count = 8*8*120
+    flattened = tf.reshape(conv5, [-1, unit_count])
+    dense = tf.layers.dense(inputs=flattened, units=unit_count, activation=tf.nn.relu)
     dropout = tf.layers.dropout(
         inputs=dense, rate=0.4, training=mode == tf.estimator.ModeKeys.TRAIN)
     full_layer2 = tf.layers.dense(inputs=dropout, units=84)
-    logits = tf.layers.dense(inputs=full_layer2, units=12)
-    predicted_classes = tf.argmax(logits, 1)
+    logits = tf.layers.dense(inputs=full_layer2, units=9)
 
     predictions = {
-        'class_ids': predicted_classes[:, tf.newaxis],
-        'probabilities': tf.nn.softmax(logits),
-        'logits': logits,
+        'probabilities': tf.nn.sigmoid(logits, name="sigmoid_tensor"),
+        'logits': logits
     }
 
     if mode == tf.estimator.ModeKeys.PREDICT:
         return tf.estimator.EstimatorSpec(mode=mode, predictions=predictions)
-
-    loss = tf.losses.sparse_softmax_cross_entropy(labels=labels, logits=logits)
+    loss = tf.losses.sigmoid_cross_entropy(multi_class_labels=labels, logits=logits)
 
     if mode == tf.estimator.ModeKeys.TRAIN:
         optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.001)
@@ -122,36 +123,30 @@ def cnn_model_fn(features, labels, mode):
             global_step=tf.train.get_global_step())
         return tf.estimator.EstimatorSpec(mode=mode, loss=loss, train_op=train_op)
 
-    eval_metric_ops = {
-        "accuracy": tf.metrics.accuracy(
-            labels=labels, predictions=predicted_classes)}
-    return tf.estimator.EstimatorSpec(
-        mode=mode, loss=loss, eval_metric_ops=eval_metric_ops)
+    eval_metric_ops = {"accuracy": tf.metrics.accuracy(labels=labels, predictions=logits)}
+
+    return tf.estimator.EstimatorSpec(mode=mode, loss=loss, eval_metric_ops=eval_metric_ops)
 
 
 def main(unused):
-    # sess = tf.InteractiveSession()
-    dataset = get_datasets()
-    # train_data, train_labels, test_data, test_labels = get_datasets()
     print('Create the Estimator')
     head_pose_classifier = tf.estimator.Estimator(
         model_fn=cnn_model_fn,
         model_dir="C:\\Users\\Hermann\\PycharmProjects\\BachelorArbeit_Headpose Estimation\\tmp\\model")
 
     print('Set up logging for predictions')
-    print('Log the values in the "Softmax" tensor with label "probabilities"')
-    tensors_to_log = {"probabilities": "softmax_tensor"}
+    print('Log the values in the "Sigmoid" tensor with label "probabilities"')
+    tensors_to_log = {"probabilities": "sigmoid_tensor"}
     logging_hook = tf.train.LoggingTensorHook(tensors=tensors_to_log, every_n_iter=50)
-
     print('Train the model')
     head_pose_classifier.train(
         input_fn=get_datasets,
         steps=20000,
         hooks=[logging_hook])
-
-    eval_results = head_pose_classifier.evaluate(input_fn=dataset)
-    print(eval_results)
+    # print("Evaluate the Model")
+    # eval_results = head_pose_classifier.evaluate(input_fn=get_datasets)
+    # print(eval_results)
 
 
 if __name__ == "__main__":
-    tf.app.run()
+    tf.app.run(main)
