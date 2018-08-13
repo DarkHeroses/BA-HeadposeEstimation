@@ -1,7 +1,7 @@
 <application>
   <component name="FindSettings">
-    <option name="customScope" value="File '...\images_tfrecords.py [BachelorArbeit_Headpose Estimation]'" />
-    <option name="defaultScopeName" value="File '...\images_tfrecords.py [BachelorArbeit_Headpose Estimation]'" />
-    <option name="SEARCH_SCOPE" value="File '...\images_tfrecords.py [BachelorArbeit_Headpose Estimation]'" />
+    <option name="customScope" value="File '...\main.py [3D_Cube]'" />
+    <option name="defaultScopeName" value="File '...\main.py [3D_Cube]'" />
+    <option name="SEARCH_SCOPE" value="File '...\main.py [3D_Cube]'" />
   </component>
 </application>
