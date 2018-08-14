@@ -5,6 +5,7 @@
       <mapping pattern="main.py" type="PLAIN_TEXT" />
       <mapping ext="tfrecords" type="PLAIN_TEXT" />
       <mapping ext="lnk" type="PLAIN_TEXT" />
+      <mapping pattern="Euler" type="Python" />
       <mapping pattern="main" type="Python" />
     </extensionMap>
   </component>
